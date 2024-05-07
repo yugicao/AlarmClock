@@ -1,0 +1,1 @@
+project_lcd_clock\startup_stm32f103xb.o: startup_stm32f103xb.s
