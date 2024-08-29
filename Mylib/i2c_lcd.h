@@ -3,11 +3,16 @@
 #include "main.h"
 
 #define LCD_ADDR_DEFAULT 0x27 << 1
-
+typedef enum
+{
+	BACKLIGHT_OFF,
+	BACKLIGHT_ON
+}backlight_state_t;// 1:on, 0:off
 typedef struct
 {
 	uint8_t adr;
 	I2C_HandleTypeDef *pI2C;
+	backlight_state_t backlight; // 1:on, 0:off
 }I2C_LCD;
 
 

@@ -1,34 +1,41 @@
 
 /** Put this in the src folder **/
 
-#include "i2c-lcd.h"
+#include "i2c_lcd.h"
 #include <stdarg.h>
 #include <stdio.h>
 
 void lcd_send_cmd (I2C_LCD *lcd, char cmd)
 {
-  char data_u, data_l;
+	char data_u, data_l;
 	uint8_t data_t[4];
-	data_u = (cmd&0xf0);
-	data_l = ((cmd<<4)&0xf0);
-	data_t[0] = data_u|0x0C;  //en=1, rs=0
-	data_t[1] = data_u|0x08;  //en=0, rs=0
-	data_t[2] = data_l|0x0C;  //en=1, rs=0
-	data_t[3] = data_l|0x08;  //en=0, rs=0
-	HAL_I2C_Master_Transmit (lcd->pI2C, lcd->adr,(uint8_t *) data_t, 4, 100);
-}
+	uint8_t backlight = lcd->backlight ? 0x08 : 0x00;
 
+	data_u = (cmd & 0xf0);
+	data_l = ((cmd << 4) & 0xf0);
+
+	data_t[0] = data_u | 0x04 | backlight; // en=1, rs=0
+	data_t[1] = data_u | backlight;        // en=0, rs=0
+	data_t[2] = data_l | 0x04 | backlight; // en=1, rs=0
+	data_t[3] = data_l | backlight;        // en=0, rs=0
+
+	HAL_I2C_Master_Transmit(lcd->pI2C, lcd->adr, (uint8_t *) data_t, 4, 100);
+}
 void lcd_send_data (I2C_LCD *lcd, char data)
 {
 	char data_u, data_l;
 	uint8_t data_t[4];
-	data_u = (data&0xf0);
-	data_l = ((data<<4)&0xf0);
-	data_t[0] = data_u|0x0D;  //en=1, rs=0
-	data_t[1] = data_u|0x09;  //en=0, rs=0
-	data_t[2] = data_l|0x0D;  //en=1, rs=0
-	data_t[3] = data_l|0x09;  //en=0, rs=0
-	HAL_I2C_Master_Transmit (lcd->pI2C, lcd->adr,(uint8_t *) data_t, 4, 100);
+	uint8_t backlight = lcd->backlight ? 0x08 : 0x00;
+
+	data_u = (data & 0xf0);
+	data_l = ((data << 4) & 0xf0);
+
+	data_t[0] = data_u | 0x05 | backlight; // en=1, rs=1
+	data_t[1] = data_u | 0x01 | backlight; // en=0, rs=1
+	data_t[2] = data_l | 0x05 | backlight; // en=1, rs=1
+	data_t[3] = data_l | 0x01 | backlight; // en=0, rs=1
+
+	HAL_I2C_Master_Transmit (lcd->pI2C, lcd->adr, (uint8_t *) data_t, 4, 100);
 }
 
 void lcd_clear (I2C_LCD *lcd)
@@ -59,6 +66,7 @@ void lcd_init (I2C_LCD *lcd, I2C_HandleTypeDef* hi2c1, uint8_t lcd_adr)
 {
 	lcd->pI2C = hi2c1;
 	lcd->adr = lcd_adr;
+	lcd->backlight = BACKLIGHT_ON;
 	// 4 bit initialisation
 	HAL_Delay(50);  // wait for >40ms
 	lcd_send_cmd (lcd, 0x30);
@@ -97,15 +105,17 @@ void lcd_send_string (I2C_LCD *lcd, const char *str, ...)
 }
 
 //back light
+
 void lcd_back_light_on(I2C_LCD *lcd)
 {
 	uint8_t data = 0x08;
-	HAL_I2C_Master_Transmit(lcd->pI2C, lcd->adr, (uint8_t*)&data, 1, 10);
+	HAL_I2C_Master_Transmit(lcd->pI2C, lcd->adr, (uint8_t*)&data, 1, 100);
+	lcd->backlight = BACKLIGHT_ON;
 }
-
 void lcd_back_light_off(I2C_LCD *lcd)
 {
 	uint8_t data = 0x00;
-	HAL_I2C_Master_Transmit(lcd->pI2C, lcd->adr, (uint8_t*)&data, 1, 10);
+	HAL_I2C_Master_Transmit(lcd->pI2C, lcd->adr, (uint8_t*)&data, 1, 100);
+	lcd->backlight = BACKLIGHT_OFF;
 }
 

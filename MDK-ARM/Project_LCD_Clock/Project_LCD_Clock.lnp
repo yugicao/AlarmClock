@@ -18,9 +18,9 @@
 "project_lcd_clock\stm32f1xx_hal_tim.o"
 "project_lcd_clock\stm32f1xx_hal_tim_ex.o"
 "project_lcd_clock\system_stm32f1xx.o"
-"project_lcd_clock\i2c-lcd.o"
 "project_lcd_clock\ds3231.o"
 "project_lcd_clock\button.o"
+"project_lcd_clock\i2c_lcd.o"
 --strict --scatter "Project_LCD_Clock\Project_LCD_Clock.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
